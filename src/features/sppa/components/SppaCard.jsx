@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Edit, Trash2, Award, Clock, TrendingUp, ListTodo, Folder } from "lucide-react";
+import { Edit, Trash2, Award, Clock, TrendingUp, ListTodo, Folder, Target } from "lucide-react";
 import SppaTachesList from "./SppaTachesList";
 import SppaProjetsList from "./SppaProjetsList";
+import SppaObjectifsList from "./SppaObjectifsList";
 
 const SppaCard = ({ sppa, onEdit, onDelete }) => {
   const [activeTab, setActiveTab] = useState("taches");
@@ -133,10 +134,10 @@ const SppaCard = ({ sppa, onEdit, onDelete }) => {
         </p>
       </div>
 
-      {/* Tâches et Projets associés */}
-      {((sppa.taches && sppa.taches.length > 0) || (sppa.projets && sppa.projets.length > 0)) && (
+      {/* Tâches, Projets et Objectifs associés */}
+      {((sppa.taches && sppa.taches.length > 0) || (sppa.projets && sppa.projets.length > 0) || (sppa.objectifs && sppa.objectifs.length > 0)) && (
         <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-2 mb-3 overflow-x-auto">
             <button
               onClick={() => setActiveTab("taches")}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
@@ -159,11 +160,24 @@ const SppaCard = ({ sppa, onEdit, onDelete }) => {
               <Folder size={14} />
               Projets ({sppa.projets?.length || 0})
             </button>
+            <button
+              onClick={() => setActiveTab("objectifs")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === "objectifs"
+                  ? "bg-orange-500 text-white shadow-sm"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              <Target size={14} />
+              Objectifs ({sppa.objectifs?.length || 0})
+            </button>
           </div>
           {activeTab === "taches" ? (
             <SppaTachesList taches={sppa.taches} />
-          ) : (
+          ) : activeTab === "projets" ? (
             <SppaProjetsList projets={sppa.projets} />
+          ) : (
+            <SppaObjectifsList objectifs={sppa.objectifs} />
           )}
         </div>
       )}

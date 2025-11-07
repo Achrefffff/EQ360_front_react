@@ -38,10 +38,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="w-full max-w-md">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">EQ360</h1>
-        <p className="text-gray-600 text-center mb-6">Connectez-vous à votre compte</p>
+    <div className="flex h-screen">
+      {/* Partie gauche - Formulaire */}
+      <div className="w-1/2 bg-white flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h2>
+          <p className="text-gray-600 mb-6">Connectez-vous à votre compte</p>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -73,12 +75,18 @@ const LoginPage = () => {
           </Button>
         </form>
 
-        <p className="text-center mt-4 text-gray-600">
-          Pas encore de compte ?{' '}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            S'inscrire
-          </Link>
-        </p>
+          <p className="text-center mt-4 text-gray-600">
+            Pas encore de compte ?{' '}
+            <Link to="/register" className="text-blue-600 hover:underline">
+              S'inscrire
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Partie droite - Branding */}
+      <div className="w-1/2 bg-black flex items-center justify-center">
+        <h1 className="text-6xl font-bold text-white">EQ360</h1>
       </div>
     </div>
   );

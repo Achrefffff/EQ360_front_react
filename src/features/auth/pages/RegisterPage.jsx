@@ -39,24 +39,27 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="w-full max-w-md">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">EQ360</h1>
-        <p className="text-gray-600 text-center mb-6">Créez votre compte</p>
+    <div className="flex h-screen">
+      {/* Partie gauche - Formulaire */}
+      <div className="w-1/2 bg-white flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">Inscription</h2>
+          <p className="text-gray-600 text-sm mb-4">Créez votre compte</p>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-3">
           <Input
             label="Nom"
             name="nom"
             value={formData.nom}
             onChange={handleChange}
             required
+            compact
           />
 
           <Input
@@ -65,6 +68,7 @@ const RegisterPage = () => {
             value={formData.prenom}
             onChange={handleChange}
             required
+            compact
           />
 
           <Input
@@ -74,6 +78,7 @@ const RegisterPage = () => {
             value={formData.email}
             onChange={handleChange}
             required
+            compact
           />
 
           <Input
@@ -82,6 +87,7 @@ const RegisterPage = () => {
             value={formData.username}
             onChange={handleChange}
             required
+            compact
           />
 
           <Input
@@ -91,6 +97,7 @@ const RegisterPage = () => {
             value={formData.dateNaissance}
             onChange={handleChange}
             required
+            compact
           />
 
           <Input
@@ -100,19 +107,26 @@ const RegisterPage = () => {
             value={formData.password}
             onChange={handleChange}
             required
+            compact
           />
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full mt-3" disabled={loading}>
             {loading ? 'Inscription...' : 'S\'inscrire'}
           </Button>
         </form>
 
-        <p className="text-center mt-4 text-gray-600">
-          Déjà un compte ?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Se connecter
-          </Link>
-        </p>
+          <p className="text-center mt-3 text-sm text-gray-600">
+            Déjà un compte ?{' '}
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Se connecter
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Partie droite - Branding */}
+      <div className="w-1/2 bg-black flex items-center justify-center">
+        <h1 className="text-6xl font-bold text-white">EQ360</h1>
       </div>
     </div>
   );
