@@ -8,6 +8,7 @@ import TacheForm from "../components/TacheForm";
 import TacheSearchBar from "../components/TacheSearchBar";
 import TacheFilters from "../components/TacheFilters";
 import Button from "../../../components/ui/Button";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const TasksPage = () => {
   const { taches, loading, createTache, updateTache, deleteTache } =
@@ -28,6 +29,8 @@ const TasksPage = () => {
   } = useTacheFilters(taches);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTache, setSelectedTache] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [tacheToDelete, setTacheToDelete] = useState(null);
 
   const handleCreate = () => {
     setSelectedTache(null);
@@ -47,9 +50,15 @@ const TasksPage = () => {
     if (result.success) setIsModalOpen(false);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette tâche ?")) {
-      await deleteTache(id);
+  const handleDelete = (id) => {
+    setTacheToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (tacheToDelete) {
+      await deleteTache(tacheToDelete);
+      setTacheToDelete(null);
     }
   };
 
@@ -57,7 +66,7 @@ const TasksPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
-          📋 Mes Tâches
+          Mes Tâches
         </h1>
         <button
           onClick={handleCreate}
@@ -89,13 +98,7 @@ const TasksPage = () => {
         onReset={resetFilters}
       />
 
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 animate-pulse">
-            Chargement des tâches...
-          </div>
-        </div>
-      ) : !taches || taches.length === 0 ? (
+      {!taches || taches.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center shadow-sm">
           <p className="text-gray-600 mb-4">
             Aucune tâche enregistrée pour le moment 🕐
@@ -138,6 +141,14 @@ const TasksPage = () => {
           onCancel={() => setIsModalOpen(false)}
         />
       </TacheModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Supprimer cette tâche ?"
+        message="Cette action est irréversible. Toutes les données associées seront définitivement supprimées."
+      />
     </div>
   );
 };

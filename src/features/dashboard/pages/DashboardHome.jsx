@@ -1,10 +1,14 @@
 import { useDashboardData } from "../hooks/useDashboardData";
+import { useChartData } from "../hooks/useChartData";
 import StatCard from "../components/StatCard";
 import TachesUrgentes from "../components/TachesUrgentes";
 import ProjetsEnCours from "../components/ProjetsEnCours";
+import XpEvolutionChart from "../components/XpEvolutionChart";
+import ObjectifsProgressionChart from "../components/ObjectifsProgressionChart";
 
 const DashboardHome = () => {
   const { taches, projets, stats, loading } = useDashboardData();
+  const { xpEvolutionData, objectifsProgressionData } = useChartData();
 
   if (loading) {
     return (
@@ -58,6 +62,12 @@ const DashboardHome = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TachesUrgentes taches={taches} />
         <ProjetsEnCours projets={projets} />
+      </div>
+
+      {/* Graphiques */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <XpEvolutionChart data={xpEvolutionData} />
+        <ObjectifsProgressionChart data={objectifsProgressionData} />
       </div>
     </div>
   );

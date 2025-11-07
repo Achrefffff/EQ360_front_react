@@ -5,11 +5,14 @@ import SppaCard from "../components/SppaCard";
 import SppaForm from "../components/SppaForm";
 import TacheModal from "../../taches/components/TacheModal";
 import Button from "../../../components/ui/Button";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const SppaPage = () => {
   const { sppas, loading, createSppa, updateSppa, deleteSppa } = useSppas();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSppa, setSelectedSppa] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [sppaToDelete, setSppaToDelete] = useState(null);
 
   const handleCreate = () => {
     setSelectedSppa(null);
@@ -28,9 +31,15 @@ const SppaPage = () => {
     if (result.success) setIsModalOpen(false);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce SPPA ?")) {
-      await deleteSppa(id);
+  const handleDelete = (id) => {
+    setSppaToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (sppaToDelete) {
+      await deleteSppa(sppaToDelete);
+      setSppaToDelete(null);
     }
   };
 
@@ -40,7 +49,7 @@ const SppaPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
-            🧩 Mes SPPA
+            Mes SPPA
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             Explorez vos Sous-Personnalités d’Activité et suivez leur évolution.
@@ -57,13 +66,7 @@ const SppaPage = () => {
       </div>
 
       {/* Content */}
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 animate-pulse">
-            Chargement des SPPA...
-          </div>
-        </div>
-      ) : !sppas || sppas.length === 0 ? (
+      {!sppas || sppas.length === 0 ? (
         <div className="bg-white/80 border border-gray-200 rounded-2xl p-12 text-center shadow-sm backdrop-blur-sm">
           <p className="text-gray-600 mb-4">
             Aucun SPPA enregistré pour le moment.
@@ -99,6 +102,14 @@ const SppaPage = () => {
           onCancel={() => setIsModalOpen(false)}
         />
       </TacheModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Supprimer ce SPPA ?"
+        message="Cette action est irréversible. Le SPPA et toutes ses données seront définitivement supprimés."
+      />
     </div>
   );
 };

@@ -14,5 +14,8 @@ export const useAuthStore = create((set) => ({
   logout: () => {
     localStorage.removeItem('token');
     set({ token: null, isAuthenticated: false });
+    // Réinitialiser le store de données
+    const { useDataStore } = require('./dataStore');
+    useDataStore.getState().reset();
   },
 }));

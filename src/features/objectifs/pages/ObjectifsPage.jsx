@@ -3,11 +3,14 @@ import { Plus } from "lucide-react";
 import { useObjectifs } from "../hooks/useObjectifs";
 import ObjectifCard from "../components/ObjectifCard";
 import ObjectifModal from "../components/ObjectifModal";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const ObjectifsPage = () => {
   const { objectifs, loading, error, createObjectif, updateObjectif, deleteObjectif } = useObjectifs();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedObjectif, setSelectedObjectif] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [objectifToDelete, setObjectifToDelete] = useState(null);
 
   const handleCreate = () => {
     setSelectedObjectif(null);
@@ -33,16 +36,22 @@ const ObjectifsPage = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet objectif ?")) {
-      await deleteObjectif(id);
+  const handleDelete = (id) => {
+    setObjectifToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (objectifToDelete) {
+      await deleteObjectif(objectifToDelete);
+      setObjectifToDelete(null);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">🎯 Mes Objectifs</h1>
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Mes Objectifs</h1>
         <button
           onClick={handleCreate}
           className="flex items-center gap-2 px-5 py-2.5 text-gray-900 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105"
@@ -59,13 +68,7 @@ const ObjectifsPage = () => {
         </div>
       )}
 
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 animate-pulse">
-            Chargement des objectifs...
-          </div>
-        </div>
-      ) : objectifs.length === 0 ? (
+      {objectifs.length === 0 ? (
         <div className="text-center py-12 bg-white/50 rounded-2xl border border-gray-200">
           <p className="text-gray-500 text-lg">Aucun objectif pour le moment</p>
           <p className="text-gray-400 text-sm mt-2">Créez votre premier objectif !</p>
@@ -91,6 +94,14 @@ const ObjectifsPage = () => {
         }}
         objectif={selectedObjectif}
         onSubmit={handleSubmit}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Supprimer cet objectif ?"
+        message="Cette action est irréversible. L'objectif et toutes ses données seront définitivement supprimés."
       />
     </div>
   );

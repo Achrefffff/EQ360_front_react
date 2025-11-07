@@ -4,11 +4,14 @@ import { useProjets } from "../hooks/useProjets";
 import ProjetCard from "../components/ProjetCard";
 import ProjetModal from "../components/ProjetModal";
 import Button from "../../../components/ui/Button";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const ProjetsPage = () => {
   const { projets, loading, error, createProjet, updateProjet, deleteProjet } = useProjets();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProjet, setSelectedProjet] = useState(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [projetToDelete, setProjetToDelete] = useState(null);
 
   const handleCreate = () => {
     setSelectedProjet(null);
@@ -34,16 +37,22 @@ const ProjetsPage = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce projet ?")) {
-      await deleteProjet(id);
+  const handleDelete = (id) => {
+    setProjetToDelete(id);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (projetToDelete) {
+      await deleteProjet(projetToDelete);
+      setProjetToDelete(null);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">📁 Mes Projets</h1>
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Mes Projets</h1>
         <button
           onClick={handleCreate}
           className="flex items-center gap-2 px-5 py-2.5 text-gray-900 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105"
@@ -60,13 +69,7 @@ const ProjetsPage = () => {
         </div>
       )}
 
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500 animate-pulse">
-            Chargement des projets...
-          </div>
-        </div>
-      ) : projets.length === 0 ? (
+      {projets.length === 0 ? (
         <div className="text-center py-12 bg-white/50 rounded-2xl border border-gray-200">
           <p className="text-gray-500 text-lg">Aucun projet pour le moment</p>
           <p className="text-gray-400 text-sm mt-2">Créez votre premier projet !</p>
@@ -92,6 +95,14 @@ const ProjetsPage = () => {
         }}
         projet={selectedProjet}
         onSubmit={handleSubmit}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Supprimer ce projet ?"
+        message="Cette action est irréversible. Le projet et toutes ses données seront définitivement supprimés."
       />
     </div>
   );

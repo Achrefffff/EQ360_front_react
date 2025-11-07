@@ -1,28 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { projetsApi } from "../../../api/projetsApi";
+import { useDataStore } from "../../../store/dataStore";
 
 export const useProjets = () => {
-  const [projets, setProjets] = useState([]);
+  const projets = useDataStore((state) => state.projets);
+  const refreshProjets = useDataStore((state) => state.refreshProjets);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const fetchProjets = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await projetsApi.getAll();
-      setProjets(data.items || []);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const createProjet = async (projetData) => {
     try {
       await projetsApi.create(projetData);
-      await fetchProjets();
+      await refreshProjets();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -32,7 +21,7 @@ export const useProjets = () => {
   const updateProjet = async (id, projetData) => {
     try {
       await projetsApi.update(id, projetData);
-      await fetchProjets();
+      await refreshProjets();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -42,22 +31,18 @@ export const useProjets = () => {
   const deleteProjet = async (id) => {
     try {
       await projetsApi.delete(id);
-      await fetchProjets();
+      await refreshProjets();
     } catch (err) {
       setError(err.message);
       throw err;
     }
   };
 
-  useEffect(() => {
-    fetchProjets();
-  }, []);
-
   return {
     projets,
     loading,
     error,
-    fetchProjets,
+    fetchProjets: refreshProjets,
     createProjet,
     updateProjet,
     deleteProjet,

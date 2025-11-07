@@ -1,31 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { sppaApi } from '../../../api/sppaApi';
+import { useDataStore } from '../../../store/dataStore';
 
 export const useSppas = () => {
-  const [sppas, setSppas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const sppas = useDataStore((state) => state.sppas);
+  const refreshSppas = useDataStore((state) => state.refreshSppas);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const fetchSppas = async () => {
-    try {
-      setLoading(true);
-      const data = await sppaApi.getAll();
-      const sppasArray = data.items || data.data || data || [];
-      setSppas(Array.isArray(sppasArray) ? sppasArray : []);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-      setSppas([]);
-      console.error('Erreur lors du chargement des SPPA:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const createSppa = async (sppaData) => {
     try {
       await sppaApi.create(sppaData);
-      await fetchSppas();
+      await refreshSppas();
       return { success: true };
     } catch (err) {
       console.error('Erreur création:', err.response?.data || err.message);
@@ -36,7 +22,7 @@ export const useSppas = () => {
   const updateSppa = async (id, sppaData) => {
     try {
       await sppaApi.update(id, sppaData);
-      await fetchSppas();
+      await refreshSppas();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
@@ -46,16 +32,12 @@ export const useSppas = () => {
   const deleteSppa = async (id) => {
     try {
       await sppaApi.delete(id);
-      await fetchSppas();
+      await refreshSppas();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
     }
   };
-
-  useEffect(() => {
-    fetchSppas();
-  }, []);
 
   return {
     sppas,
@@ -64,6 +46,6 @@ export const useSppas = () => {
     createSppa,
     updateSppa,
     deleteSppa,
-    refreshSppas: fetchSppas,
+    refreshSppas,
   };
 };

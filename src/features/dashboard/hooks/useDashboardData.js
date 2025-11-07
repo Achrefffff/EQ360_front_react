@@ -1,45 +1,13 @@
-import { useState, useEffect } from "react";
-import { tachesApi } from "../../../api/tachesApi";
-import { projetsApi } from "../../../api/projetsApi";
-import { sppaApi } from "../../../api/sppaApi";
-import { objectifsApi } from "../../../api/objectifsApi";
+import { useDataStore } from "../../../store/dataStore";
 
 export const useDashboardData = () => {
-  const [taches, setTaches] = useState([]);
-  const [projets, setProjets] = useState([]);
-  const [sppas, setSppas] = useState([]);
-  const [objectifs, setObjectifs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const taches = useDataStore((state) => state.taches);
+  const projets = useDataStore((state) => state.projets);
+  const sppas = useDataStore((state) => state.sppas);
+  const objectifs = useDataStore((state) => state.objectifs);
+  const loading = false;
+  const error = null;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [tachesData, projetsData, sppaData, objectifsData] = await Promise.all([
-          tachesApi.getAll(),
-          projetsApi.getAll(),
-          sppaApi.getAll(),
-          objectifsApi.getAll(),
-        ]);
-
-        setTaches(tachesData.items || []);
-        setProjets(projetsData.items || []);
-        setSppas(sppaData.items || []);
-        setObjectifs(objectifsData.items || []);
-      } catch (err) {
-        setError(err.message);
-        console.error("Erreur lors du chargement des données:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Calculer les statistiques
   const stats = {
     taches: {
       total: taches.length,
