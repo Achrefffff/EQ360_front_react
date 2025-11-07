@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { Loader2 } from 'lucide-react';
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import { sppaApi } from "../../../api/sppaApi";
 
 const ProjetForm = ({ projet, onSubmit, onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     nom: "",
     typeProjet: "",
@@ -50,14 +52,19 @@ const ProjetForm = ({ projet, onSubmit, onCancel }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSend = {
-      ...formData,
-      budget: formData.budget ? parseFloat(formData.budget) : 0,
-      sppaId: formData.sppaId ? parseInt(formData.sppaId) : null,
-    };
-    onSubmit(dataToSend);
+    setIsSubmitting(true);
+    try {
+      const dataToSend = {
+        ...formData,
+        budget: formData.budget ? parseFloat(formData.budget) : 0,
+        sppaId: formData.sppaId ? parseInt(formData.sppaId) : null,
+      };
+      await onSubmit(dataToSend);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -169,10 +176,18 @@ const ProjetForm = ({ projet, onSubmit, onCancel }) => {
             color: "white",
           }}
           className="hover:opacity-90"
+          disabled={isSubmitting}
         >
-          {projet ? "Modifier" : "Créer"}
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              {projet ? 'Modification...' : 'Création...'}
+            </span>
+          ) : (
+            projet ? "Modifier" : "Créer"
+          )}
         </Button>
-        <Button type="button" onClick={onCancel} variant="secondary">
+        <Button type="button" onClick={onCancel} variant="secondary" disabled={isSubmitting}>
           Annuler
         </Button>
       </div>

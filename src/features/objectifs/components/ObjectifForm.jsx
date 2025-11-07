@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { Loader2 } from 'lucide-react';
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import { sppaApi } from "../../../api/sppaApi";
 import { projetsApi } from "../../../api/projetsApi";
 
 const ObjectifForm = ({ objectif, onSubmit, onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     titre: "",
     description: "",
@@ -63,14 +65,19 @@ const ObjectifForm = ({ objectif, onSubmit, onCancel }) => {
     setFormData((prev) => ({ ...prev, projetIds: selectedOptions }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const dataToSend = {
-      ...formData,
-      sppaId: formData.sppaId ? parseInt(formData.sppaId) : null,
-      projetIds: formData.projetIds.length > 0 ? formData.projetIds : null,
-    };
-    onSubmit(dataToSend);
+    setIsSubmitting(true);
+    try {
+      const dataToSend = {
+        ...formData,
+        sppaId: formData.sppaId ? parseInt(formData.sppaId) : null,
+        projetIds: formData.projetIds.length > 0 ? formData.projetIds : null,
+      };
+      await onSubmit(dataToSend);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -219,10 +226,18 @@ const ObjectifForm = ({ objectif, onSubmit, onCancel }) => {
             color: "white",
           }}
           className="hover:opacity-90"
+          disabled={isSubmitting}
         >
-          {objectif ? "Modifier" : "Créer"}
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              {objectif ? 'Modification...' : 'Création...'}
+            </span>
+          ) : (
+            objectif ? "Modifier" : "Créer"
+          )}
         </Button>
-        <Button type="button" onClick={onCancel} variant="secondary">
+        <Button type="button" onClick={onCancel} variant="secondary" disabled={isSubmitting}>
           Annuler
         </Button>
       </div>

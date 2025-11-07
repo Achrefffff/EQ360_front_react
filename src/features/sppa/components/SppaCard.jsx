@@ -7,12 +7,12 @@ import SppaObjectifsList from "./SppaObjectifsList";
 const SppaCard = ({ sppa, onEdit, onDelete }) => {
   const [activeTab, setActiveTab] = useState("taches");
   const currentXp = sppa.experienceXp || 0;
-  const currentLevel = sppa.niveau || 0;
+  const currentLevel = sppa.niveau || 1;
   const xpForCurrentLevel = (currentLevel - 1) * 100;
   const xpForNextLevel = currentLevel * 100;
   const xpInCurrentLevel = currentXp - xpForCurrentLevel;
   const xpNeededForNextLevel = xpForNextLevel - currentXp;
-  const progressPercentage = Math.min((xpInCurrentLevel / 100) * 100, 100);
+  const progressPercentage = currentLevel > 0 ? Math.min((xpInCurrentLevel / 100) * 100, 100) : 0;
 
   return (
     <div className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fadeInUp">
@@ -29,7 +29,7 @@ const SppaCard = ({ sppa, onEdit, onDelete }) => {
             <h3 className="text-lg font-semibold text-gray-900 leading-tight">
               {sppa.nom}
             </h3>
-            <p className="text-sm text-gray-500">Niveau {sppa.niveau || 0}</p>
+            <p className="text-sm text-gray-500">Niveau {sppa.niveau || 1}</p>
           </div>
         </div>
         <div className="flex gap-2">

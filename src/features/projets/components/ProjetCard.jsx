@@ -1,6 +1,17 @@
-import { Edit, Trash2, Calendar, DollarSign, Folder } from "lucide-react";
+import { useState } from "react";
+import { Edit, Trash2, Calendar, DollarSign, Folder, Check } from "lucide-react";
+import { useProjets } from "../hooks/useProjets";
 
 const ProjetCard = ({ projet, onEdit, onDelete }) => {
+  const { updateProjet } = useProjets();
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggleComplete = async () => {
+    if (projet.statut === 'termine') return;
+    setIsToggling(true);
+    await updateProjet(projet.id, { ...projet, statut: 'termine' });
+    setIsToggling(false);
+  };
   const getStatutColor = (statut) => {
     const colors = {
       "en_cours": "bg-blue-100 text-blue-700 border-blue-200",
@@ -28,6 +39,20 @@ const ProjetCard = ({ projet, onEdit, onDelete }) => {
           </div>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={handleToggleComplete}
+            disabled={isToggling || projet.statut === 'termine'}
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 ${
+              projet.statut === 'termine' ? 'bg-green-500 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400 cursor-pointer'
+            }`}
+            title={projet.statut === 'termine' ? 'Projet terminé' : 'Marquer comme terminé'}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                projet.statut === 'termine' ? 'translate-x-4.5' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
           <button
             onClick={() => onEdit(projet)}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

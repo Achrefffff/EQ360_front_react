@@ -5,6 +5,8 @@ import { useDataStore } from '../../../store/dataStore';
 export const useTaches = () => {
   const taches = useDataStore((state) => state.taches);
   const refreshTaches = useDataStore((state) => state.refreshTaches);
+  const refreshSppas = useDataStore((state) => state.refreshSppas);
+  const refreshProjets = useDataStore((state) => state.refreshProjets);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,6 +23,8 @@ export const useTaches = () => {
       console.log('Données envoyées:', formattedData);
       await tachesApi.create(formattedData);
       await refreshTaches();
+      if (formattedData.sppaId) await refreshSppas();
+      if (formattedData.projetId) await refreshProjets();
       return { success: true };
     } catch (err) {
       console.error('Erreur création:', err.response?.data || err.message);
@@ -40,6 +44,8 @@ export const useTaches = () => {
       };
       await tachesApi.update(id, formattedData);
       await refreshTaches();
+      if (formattedData.sppaId) await refreshSppas();
+      if (formattedData.projetId) await refreshProjets();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
@@ -50,6 +56,8 @@ export const useTaches = () => {
     try {
       await tachesApi.delete(id);
       await refreshTaches();
+      await refreshSppas();
+      await refreshProjets();
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };

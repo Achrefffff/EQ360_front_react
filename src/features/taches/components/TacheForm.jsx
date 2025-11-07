@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 import { useSppas } from '../../sppa/hooks/useSppas';
@@ -7,6 +8,7 @@ import { useProjets } from '../../projets/hooks/useProjets';
 const TacheForm = ({ tache, onSubmit, onCancel }) => {
   const { sppas } = useSppas();
   const { projets } = useProjets();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     nom: '',
@@ -45,9 +47,14 @@ const TacheForm = ({ tache, onSubmit, onCancel }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -183,10 +190,17 @@ const TacheForm = ({ tache, onSubmit, onCancel }) => {
       />
 
       <div className="flex gap-3 pt-4">
-        <Button type="submit" className="flex-1">
-          {tache ? 'Modifier' : 'Créer'}
+        <Button type="submit" className="flex-1" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              {tache ? 'Modification...' : 'Création...'}
+            </span>
+          ) : (
+            tache ? 'Modifier' : 'Créer'
+          )}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isSubmitting}>
           Annuler
         </Button>
       </div>

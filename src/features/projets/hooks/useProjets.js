@@ -5,6 +5,8 @@ import { useDataStore } from "../../../store/dataStore";
 export const useProjets = () => {
   const projets = useDataStore((state) => state.projets);
   const refreshProjets = useDataStore((state) => state.refreshProjets);
+  const refreshSppas = useDataStore((state) => state.refreshSppas);
+  const refreshObjectifs = useDataStore((state) => state.refreshObjectifs);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,6 +14,8 @@ export const useProjets = () => {
     try {
       await projetsApi.create(projetData);
       await refreshProjets();
+      if (projetData.sppaId) await refreshSppas();
+      if (projetData.objectifId) await refreshObjectifs();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -22,6 +26,8 @@ export const useProjets = () => {
     try {
       await projetsApi.update(id, projetData);
       await refreshProjets();
+      if (projetData.sppaId) await refreshSppas();
+      if (projetData.objectifId) await refreshObjectifs();
     } catch (err) {
       setError(err.message);
       throw err;
@@ -32,6 +38,8 @@ export const useProjets = () => {
     try {
       await projetsApi.delete(id);
       await refreshProjets();
+      await refreshSppas();
+      await refreshObjectifs();
     } catch (err) {
       setError(err.message);
       throw err;

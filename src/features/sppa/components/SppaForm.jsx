@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 
 const SppaForm = ({ sppa, onSubmit, onCancel }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     nom: '',
     description: '',
@@ -31,9 +33,14 @@ const SppaForm = ({ sppa, onSubmit, onCancel }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addCompetence = () => {
@@ -185,10 +192,17 @@ const SppaForm = ({ sppa, onSubmit, onCancel }) => {
       </div>
 
       <div className="flex gap-3 pt-4">
-        <Button type="submit" className="flex-1">
-          {sppa ? 'Modifier' : 'Créer'}
+        <Button type="submit" className="flex-1" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="animate-spin" size={16} />
+              {sppa ? 'Modification...' : 'Création...'}
+            </span>
+          ) : (
+            sppa ? 'Modifier' : 'Créer'
+          )}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isSubmitting}>
           Annuler
         </Button>
       </div>

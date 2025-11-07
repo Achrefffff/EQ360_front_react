@@ -1,6 +1,17 @@
-import { Edit, Trash2, Calendar, Target, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { Edit, Trash2, Calendar, Target, TrendingUp, Check } from "lucide-react";
+import { useObjectifs } from "../hooks/useObjectifs";
 
 const ObjectifCard = ({ objectif, onEdit, onDelete }) => {
+  const { updateObjectif } = useObjectifs();
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggleComplete = async () => {
+    if (objectif.statut === 'atteint') return;
+    setIsToggling(true);
+    await updateObjectif(objectif.id, { ...objectif, statut: 'atteint' });
+    setIsToggling(false);
+  };
   const getStatutColor = (statut) => {
     const colors = {
       "en_cours": "bg-blue-100 text-blue-700 border-blue-200",
@@ -36,6 +47,20 @@ const ObjectifCard = ({ objectif, onEdit, onDelete }) => {
           </div>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={handleToggleComplete}
+            disabled={isToggling || objectif.statut === 'atteint'}
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 ${
+              objectif.statut === 'atteint' ? 'bg-green-500 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400 cursor-pointer'
+            }`}
+            title={objectif.statut === 'atteint' ? 'Objectif atteint' : 'Marquer comme atteint'}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                objectif.statut === 'atteint' ? 'translate-x-4.5' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
           <button
             onClick={() => onEdit(objectif)}
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
