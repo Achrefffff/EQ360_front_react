@@ -1,14 +1,31 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useTaches } from "../hooks/useTaches";
+import { useTacheFilters } from "../hooks/useTacheFilters";
 import TacheCard from "../components/TacheCard";
 import TacheModal from "../components/TacheModal";
 import TacheForm from "../components/TacheForm";
+import TacheSearchBar from "../components/TacheSearchBar";
+import TacheFilters from "../components/TacheFilters";
 import Button from "../../../components/ui/Button";
 
 const TasksPage = () => {
   const { taches, loading, createTache, updateTache, deleteTache } =
     useTaches();
+  const {
+    searchTerm,
+    setSearchTerm,
+    statutFilter,
+    setStatutFilter,
+    prioriteFilter,
+    setPrioriteFilter,
+    sppaFilter,
+    setSppaFilter,
+    projetFilter,
+    setProjetFilter,
+    filteredTaches,
+    resetFilters,
+  } = useTacheFilters(taches);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTache, setSelectedTache] = useState(null);
 
@@ -52,6 +69,26 @@ const TasksPage = () => {
         </button>
       </div>
 
+      {/* Barre de recherche */}
+      <TacheSearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onClear={() => setSearchTerm('')}
+      />
+
+      {/* Filtres */}
+      <TacheFilters
+        statutFilter={statutFilter}
+        prioriteFilter={prioriteFilter}
+        sppaFilter={sppaFilter}
+        projetFilter={projetFilter}
+        onStatutChange={setStatutFilter}
+        onPrioriteChange={setPrioriteFilter}
+        onSppaChange={setSppaFilter}
+        onProjetChange={setProjetFilter}
+        onReset={resetFilters}
+      />
+
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-gray-500 animate-pulse">
@@ -65,9 +102,21 @@ const TasksPage = () => {
           </p>
           <Button onClick={handleCreate}>Créer ma première tâche</Button>
         </div>
+      ) : filteredTaches.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center shadow-sm">
+          <p className="text-gray-600 mb-4">
+            Aucune tâche ne correspond à vos critères de recherche 🔍
+          </p>
+          <button
+            onClick={resetFilters}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Réinitialiser les filtres
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {taches.map((tache) => (
+          {filteredTaches.map((tache) => (
             <TacheCard
               key={tache.id}
               tache={tache}
